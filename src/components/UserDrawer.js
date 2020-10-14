@@ -3,22 +3,6 @@ import {api} from '../API/api'
 
 import { Drawer, Form, Input, Button } from 'antd';
 
-const layout = {
-    labelCol: {
-      span: 8,
-    },
-    wrapperCol: {
-      span: 16,
-    },
-};
-
-const tailLayout = {
-  wrapperCol: {
-    offset: 8,
-    span: 16,
-  },
-};
-
 const UserDrawer = ({user, visible, onClose }) => {    
 
   const [fields, setFields] = useState([
@@ -38,9 +22,22 @@ const UserDrawer = ({user, visible, onClose }) => {
 
   const onFinish = (values) => {
     if (!user) {
-      api.createUser(values).then(() => {onClose()})
+      api.createUser(values).then(res => {
+        if ( res.status < 300) {
+          onClose()
+        } else {
+          alert(res.response?.data?.message || 'Something went wrong')
+        }
+      })
     } else {
-      api.updateUser({...user, ...values}).then(() => { onClose()})
+      api.updateUser({...user, ...values}).then(res => {
+        console.log(res)
+        if ( res.status < 300) {
+          onClose()
+        } else {
+          alert(res.response?.data?.message || 'Something went wrong')
+        }
+      })
     }
   };
 
@@ -61,7 +58,7 @@ const UserDrawer = ({user, visible, onClose }) => {
         }}
         onFinish={onFinish}
       >
-        {user ? <h3>Update User Data</h3> : <h3>Add New User</h3>}
+        {user ? <h2>Update User Data</h2> : <h2>Add New User</h2>}
         <Form.Item
           label="First Name"
           name="firstName"
@@ -89,7 +86,7 @@ const UserDrawer = ({user, visible, onClose }) => {
         </Form.Item>
 
         <Form.Item
-          label="Email"
+          label="Your email"
           name="email"
           rules={[
             {
@@ -105,7 +102,7 @@ const UserDrawer = ({user, visible, onClose }) => {
           <Input />
         </Form.Item>
 
-        <Form.Item {...tailLayout}>
+        <Form.Item>
           <Button type="primary" htmlType="submit">
             Submit
           </Button>

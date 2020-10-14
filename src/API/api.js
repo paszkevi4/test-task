@@ -5,9 +5,10 @@ let instance = axios.create({
 })
 
 export const api = {
-    getUsers(page = 1, limit = 9) {
-        return instance.get(`?page=${page}&limit=${limit}`)
-            .then (response => response.data )
+    getUsers(pagination, params) {
+        return instance.get(`?page=${pagination.current}&limit=${pagination.pageSize}&sortBy=${params.sortBy}&dir=${params.dir}${params.phrase && `&sortPhrase=${params.phrase}`}`)
+            .then (response => response.data)
+            .catch(err => err)
     },
     createUser (user) {
         return instance.post('', user)
@@ -16,10 +17,12 @@ export const api = {
     },
     updateUser (user) {
         return instance.put('', user)
-            .then(response => response.data)
+            .then(response => response)
+            .catch(err => err)
     },  
     deleteUser(id) {
         return instance.delete(`${id}`)
             .then(response => response.data)
+            .catch(err => err)
     }, 
 }

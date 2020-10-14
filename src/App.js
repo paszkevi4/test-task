@@ -9,40 +9,50 @@ import {api} from './API/api'
 function App() {
   
   let userDrawerKey = React.useRef(0)
-  const [visibleSearch, setVisibleSearch] = useState(false);
+
+  const [visibleSearch, setVisibleSearch] = useState(true);
   const [visibleUsers, setVisibleUsers] = useState(false);
+
   const [userToEdit, setUserToEdit] = useState(null);
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 7,
     total: 9,
+    position: ["bottomCenter"],
   });
+  const [params, setParams] = useState({
+    sortBy: 'firstName', 
+    dir: 'asc', 
+    phrase: '',
+  })
 
   window.userToEdit = userToEdit
 
   const fetchUsers = async() => {
-    const res = await api.getUsers(pagination.current, pagination.pageSize)
+    // const res = await api.getUsers(page = {pagination.current}, limit = {pagination.pageSize}, sortBy = {params.sortBy}, dir = {params.dir}, phrase ={ params.phrase})
+    const res = await api.getUsers(pagination, params)
     setDataSource(res.docs)
     setPagination({
+      ...pagination,
       current: res.page,
-      pageSize: 7,
+      pageSize: res.limit,
       total: res.totalDocs,
     })
   }
 
   useEffect(() => {
     fetchUsers()
-  }, [pagination.current, visibleUsers])
+  }, [pagination.current])
 
   const showDrawer = (record) => {
-    console.log(record)
     setUserToEdit(record)
     setVisibleUsers(true);
   };
 
   const onClose = () => {
     setVisibleUsers(false);
+    setVisibleSearch(false);
     fetchUsers()
     userDrawerKey.current += 1
   };
@@ -52,16 +62,19 @@ function App() {
       title: 'First Name',
       dataIndex: 'firstName',
       key: 'firstname',
+      sorter: (a, b) => a.firstName.toLowerCase().localeCompare(b.firstName.toLowerCase()),
     },
     {
       title: 'Last Name',
       dataIndex: 'lastName',
       key: 'lastname',
+      sorter: (a, b) => a.lastName.toLowerCase().localeCompare(b.lastName.toLowerCase()),
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      sorter: (a, b) => a.email.localeCompare(b.email),
     },
     {
       title: 'Actions',
@@ -78,13 +91,15 @@ function App() {
   return (
     <>
       <Table dataSource={dataSource} columns={columns} pagination={pagination} onChange={e => {setPagination(e)}} />
-      <Button type="primary" onClick={() => setVisibleSearch(true)}>
-        Search
-      </Button>
-      <Button type="primary" onClick={() => showDrawer(null)}>
-        Add User
-      </Button>
-      <SearchDrawer user={userToEdit} visible={visibleSearch} onClose={onClose} />
+      <div className='btn__wrapper'>
+        <Button type="primary" onClick={() => setVisibleSearch(true)}>
+          Search
+        </Button>
+        <Button type="primary" onClick={() => showDrawer(null)}>
+          Add User
+        </Button>
+      </div> 
+      <SearchDrawer user={userToEdit} visible={visibleSearch} params={params} setParams={setParams} onClose={onClose} />
       <UserDrawer key={userToEdit?._id || userDrawerKey.current} user={userToEdit} visible={visibleUsers} onClose={onClose} />
     </>
   );
