@@ -3,7 +3,7 @@ import {api} from '../API/api'
 
 import { Drawer, Form, Input, Button } from 'antd';
 
-const UserDrawer = ({user, visible, onClose }) => {    
+const UserDrawer = ({user, visible, onClose, setShowSpinner }) => {    
 
   const [fields, setFields] = useState([
     {
@@ -21,6 +21,7 @@ const UserDrawer = ({user, visible, onClose }) => {
   ]);
 
   const onFinish = (values) => {
+    setShowSpinner(true)
     if (!user) {
       api.createUser(values).then(res => {
         if ( res.status < 300) {
@@ -31,7 +32,6 @@ const UserDrawer = ({user, visible, onClose }) => {
       })
     } else {
       api.updateUser({...user, ...values}).then(res => {
-        console.log(res)
         if ( res.status < 300) {
           onClose()
         } else {

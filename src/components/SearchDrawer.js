@@ -1,8 +1,6 @@
 import React, {useState} from 'react'
-import {api} from '../API/api'
 
 import { Drawer, Form, Input, Button, Radio } from 'antd';
-const { Search } = Input
 
 const options = [
   { label: 'Ascending ', value: 'asc' },
@@ -54,7 +52,6 @@ const SearchDrawer = ({user, visible, params, setParams, onClose }) => {
           <Input
               placeholder="input search text"
               size="large"
-              onSearch={value => console.log(value)}
           />
         </Form.Item>
 

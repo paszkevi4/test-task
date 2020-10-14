@@ -83,7 +83,10 @@ function App() {
       render: (_, record) => (
         <>
           <a onClick={() => {showDrawer(record)}} >Edit</a>
-          <a onClick={() => {api.deleteUser(record._id).then(() => {fetchUsers()})}} >Delete</a>
+          <a onClick={() => {
+            setShowSpinner(true)
+            api.deleteUser(record._id).then(() => {fetchUsers()})
+          }} >Delete</a>
         </>
       ),
     }
@@ -104,7 +107,7 @@ function App() {
         <Spin size="large" />
       </div>}
       <SearchDrawer user={userToEdit} visible={visibleSearch} params={params} setParams={setParams} onClose={onClose} />
-      <UserDrawer key={userToEdit?._id || userDrawerKey.current} user={userToEdit} visible={visibleUsers} onClose={onClose} />
+      <UserDrawer key={userToEdit?._id || userDrawerKey.current} user={userToEdit} visible={visibleUsers} onClose={onClose} setShowSpinner={setShowSpinner} />
     </>
   );
 }
