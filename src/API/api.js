@@ -11,7 +11,8 @@ export const api = {
     },
     createUser (user) {
         return instance.post('', user)
-            .then(response => response.data)
+            .then(response => response)
+            .catch(err => err)
     },
     updateUser (user) {
         return instance.put('', user)

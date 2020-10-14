@@ -2,12 +2,15 @@ import React, {useState, useEffect} from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
 import { Table, Button } from 'antd';
-import Drawer from './components/Drawer'
+import UserDrawer from './components/UserDrawer'
+import SearchDrawer from './components/SearchDrawer'
 import {api} from './API/api'
 
 function App() {
   
-  const [visible, setVisible] = useState(false);
+  let userDrawerKey = React.useRef(0)
+  const [visibleSearch, setVisibleSearch] = useState(false);
+  const [visibleUsers, setVisibleUsers] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
   const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
@@ -18,29 +21,30 @@ function App() {
 
   window.userToEdit = userToEdit
 
+  const fetchUsers = async() => {
+    const res = await api.getUsers(pagination.current, pagination.pageSize)
+    setDataSource(res.docs)
+    setPagination({
+      current: res.page,
+      pageSize: 7,
+      total: res.totalDocs,
+    })
+  }
+
   useEffect(() => {
-    async function func() {
-      const res = await api.getUsers(pagination.current, pagination.pageSize)
-      setDataSource(res.docs)
-      setPagination({
-        current: res.page,
-        pageSize: 7,
-        total: res.totalDocs,
-      })
-    }
-    func()
-  }, [pagination.current, visible])
+    fetchUsers()
+  }, [pagination.current, visibleUsers])
 
   const showDrawer = (record) => {
-    if (record) {
-      console.log(record)
-      setUserToEdit(record)
-    }
-    setVisible(true);
+    console.log(record)
+    setUserToEdit(record)
+    setVisibleUsers(true);
   };
 
   const onClose = () => {
-    setVisible(false);
+    setVisibleUsers(false);
+    fetchUsers()
+    userDrawerKey.current += 1
   };
   
   const columns = [
@@ -65,7 +69,7 @@ function App() {
       render: (_, record) => (
         <>
           <a onClick={() => {showDrawer(record)}} >Edit</a>
-          <a onClick={() => {api.deleteUser(record._id)}} >Delete</a>
+          <a onClick={() => {api.deleteUser(record._id).then(() => {fetchUsers()})}} >Delete</a>
         </>
       ),
     }
@@ -74,10 +78,14 @@ function App() {
   return (
     <>
       <Table dataSource={dataSource} columns={columns} pagination={pagination} onChange={e => {setPagination(e)}} />
-      <Button type="primary" onClick={() => showDrawer()}>
-        Open
+      <Button type="primary" onClick={() => setVisibleSearch(true)}>
+        Search
       </Button>
-      <Drawer key={userToEdit?._id} user={userToEdit} visible={visible} onClose={onClose} />
+      <Button type="primary" onClick={() => showDrawer(null)}>
+        Add User
+      </Button>
+      <SearchDrawer user={userToEdit} visible={visibleSearch} onClose={onClose} />
+      <UserDrawer key={userToEdit?._id || userDrawerKey.current} user={userToEdit} visible={visibleUsers} onClose={onClose} />
     </>
   );
 }
