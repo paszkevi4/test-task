@@ -1,20 +1,14 @@
-.btn__wrapper {
+.btn__wrapper,
+.ant-radio-group,
+.ant-form-item-control-input-content,
+.spinner,
+h2 {
   display: flex;
   justify-content: center;
 }
 
 .btn__wrapper button {
   margin: 0 15px;
-}
-
-.ant-radio-group {
-  display: flex;
-  justify-content: center;
-}
-
-.ant-form-item-control-input-content {
-  display: flex;
-  justify-content: center;
 }
 
 .ant-form-item {
@@ -26,7 +20,6 @@
   margin-right: 15px;
 }
 
-h2 {
-  display: flex;
-  justify-content: center;
+.spinner {
+  margin-top: 40px;
 }

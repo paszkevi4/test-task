@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Table, Button } from 'antd';
+import { Table, Button, Spin } from 'antd';
 import UserDrawer from './components/UserDrawer'
 import SearchDrawer from './components/SearchDrawer'
 import {api} from './API/api'
@@ -9,12 +9,14 @@ import {api} from './API/api'
 function App() {
   
   let userDrawerKey = React.useRef(0)
+  const [showSpinner, setShowSpinner] = useState(false);
 
   const [visibleSearch, setVisibleSearch] = useState(true);
   const [visibleUsers, setVisibleUsers] = useState(false);
 
   const [userToEdit, setUserToEdit] = useState(null);
   const [dataSource, setDataSource] = useState([]);
+
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 7,
@@ -27,10 +29,8 @@ function App() {
     phrase: '',
   })
 
-  window.userToEdit = userToEdit
-
   const fetchUsers = async() => {
-    // const res = await api.getUsers(page = {pagination.current}, limit = {pagination.pageSize}, sortBy = {params.sortBy}, dir = {params.dir}, phrase ={ params.phrase})
+    setShowSpinner(true)
     const res = await api.getUsers(pagination, params)
     setDataSource(res.docs)
     setPagination({
@@ -39,6 +39,7 @@ function App() {
       pageSize: res.limit,
       total: res.totalDocs,
     })
+    setShowSpinner(false)
   }
 
   useEffect(() => {
@@ -99,6 +100,9 @@ function App() {
           Add User
         </Button>
       </div> 
+      {showSpinner && <div className='spinner'>
+        <Spin size="large" />
+      </div>}
       <SearchDrawer user={userToEdit} visible={visibleSearch} params={params} setParams={setParams} onClose={onClose} />
       <UserDrawer key={userToEdit?._id || userDrawerKey.current} user={userToEdit} visible={visibleUsers} onClose={onClose} />
     </>
